@@ -1,5 +1,7 @@
 import redis from "../config/redis.js";
 import { redisKeys } from "../utils/redisKeys.js";
+import Booking from "../models/Booking.js";
+
 
 export async function confirmBooking(req, res){
     const {trainId}=req.params
@@ -58,9 +60,34 @@ export async function confirmBooking(req, res){
     pipeline.del(userLockKey);
     pipeline.del(activeKey);
     await pipeline.exec()
+    const booking = await Booking.create({
+        userId,
+        trainId,
+        seats
+    })
 
     return res.json({
         status:"BOOKED",
-        seats
+        seats,
+        bookingId: booking._id
     })
+}
+
+export async function myBookings(req, res){
+    try {
+        const userId = req.user.id;
+
+        const bookings = await Booking.find({ userId })
+        .sort({ createdAt: -1 });
+
+        return res.json({
+        count: bookings.length,
+        bookings
+        });
+
+    } catch (err) {
+        return res.status(500).json({
+        message: "Failed to fetch bookings"
+        });
+    }
 }
