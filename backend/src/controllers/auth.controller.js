@@ -1,6 +1,8 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
+import dotenv from "dotenv";
+dotenv.config();
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
@@ -38,8 +40,9 @@ export async function register(req, res) {
 // LOGIN
 export async function login(req, res) {
   try {
+    console.log("Login request received with body:", req.body);
     const { email, password } = req.body;
-
+    
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(401).json({ message: "Invalid credentials" });
@@ -49,12 +52,14 @@ export async function login(req, res) {
     if (!isMatch) {
       return res.status(401).json({ message: "Invalid credentials" });
     }
-
+    console.log(JWT_SECRET);
+    
     const token = jwt.sign(
       { id: user._id },
       JWT_SECRET,
       { expiresIn: "1h" }
     );
+    console.log("Signed");
 
     return res.json({
       token
