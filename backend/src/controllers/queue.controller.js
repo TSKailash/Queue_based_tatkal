@@ -6,6 +6,7 @@ export async function joinQueue(req, res){
     const userId=req.user.id
 
     if(!userId){
+        console.log("Unauthorized access attempt to join queue");
         return res.status(401).json({message: "Unauthorized user"})
     }
 

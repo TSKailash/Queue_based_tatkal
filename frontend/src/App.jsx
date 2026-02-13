@@ -4,6 +4,7 @@ import Register from "./pages/Register";
 import Queue from "./pages/Queue";
 import Seats from "./pages/Seats";
 import History from "./pages/History";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
   return (
@@ -11,9 +12,33 @@ function App() {
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/queue" element={<Queue />} />
-        <Route path="/seats/:trainId" element={<Seats />} />
-        <Route path="/history" element={<History />} />
+
+        <Route
+          path="/queue"
+          element={
+            <ProtectedRoute>
+              <Queue />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/seats/:trainId"
+          element={
+            <ProtectedRoute>
+              <Seats />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/history"
+          element={
+            <ProtectedRoute>
+              <History />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
     </BrowserRouter>
   );
