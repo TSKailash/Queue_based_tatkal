@@ -1,10 +1,11 @@
 import redis from "../config/redis.js";
 import { redisKeys } from "../utils/redisKeys.js";
 
-const SEATS = ["S1", "S2", "S3", "S4", "S5"];
+const SEATS = Array.from({ length: 20 }, (_, i) => `S${i + 1}`);
 
 export async function getSeatStatus(req, res) {
   const { trainId } = req.params;
+  const userId = req.user.id;
 
   const seatsStatus = {};
 
@@ -12,29 +13,24 @@ export async function getSeatStatus(req, res) {
     const bookedKey = `booked:train:${trainId}:${seat}`;
     const lockKey = `seat:train:${trainId}:${seat}`;
 
-    // 1️⃣ Check BOOKED first
     const bookedBy = await redis.get(bookedKey);
     if (bookedBy) {
       seatsStatus[seat] = {
         status: "BOOKED",
-        bookedBy,
       };
       continue;
     }
 
-    // 2️⃣ Check LOCKED
     const lockedBy = await redis.get(lockKey);
     if (lockedBy) {
-      const ttl = await redis.ttl(lockKey);
       seatsStatus[seat] = {
-        status: "LOCKED",
-        lockedBy,
-        expiresIn: ttl,
+        status:
+          lockedBy === userId ? "LOCKED_BY_ME" : "LOCKED_BY_OTHER",
+        expiresIn: await redis.ttl(lockKey),
       };
       continue;
     }
 
-    // 3️⃣ AVAILABLE
     seatsStatus[seat] = {
       status: "AVAILABLE",
     };

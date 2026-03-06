@@ -52,7 +52,7 @@ export async function login(req, res) {
     if (!isMatch) {
       return res.status(401).json({ message: "Invalid credentials" });
     }
-    console.log(JWT_SECRET);
+    // console.log(JWT_SECRET);
     
     const token = jwt.sign(
       { id: user._id },
