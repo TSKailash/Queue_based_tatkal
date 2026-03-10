@@ -1,6 +1,9 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "../api/axios";
+import { Button } from "../components/ui/Button";
+import { Input } from "../components/ui/Input";
+import { Loader } from "../components/ui/Loader";
 
 export default function Queue() {
   const navigate = useNavigate();
@@ -15,13 +18,10 @@ export default function Queue() {
   const handleJoin = async () => {
     try {
       setLoading(true);
-
       const res = await axios.post(`/queue/join/${trainId}`);
-
       setJoined(true);
       setPosition(res.data.position);
       setStatus(res.data.status);
-
     } catch (err) {
       alert(err.response?.data?.message || "Failed to join queue");
     } finally {
@@ -43,7 +43,6 @@ export default function Queue() {
           clearInterval(interval);
           navigate(`/seats/${trainId}`);
         }
-
       } catch (err) {
         console.log("Polling error");
       }
@@ -53,47 +52,68 @@ export default function Queue() {
   }, [joined, trainId, navigate]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="bg-white p-8 rounded-xl shadow-lg w-full max-w-md">
-
-        <h2 className="text-2xl font-bold text-center mb-6">
-          Join Tatkal Queue
-        </h2>
-
-        {!joined ? (
-          <>
-            <label className="block mb-2 text-sm text-gray-600">
-              Train ID
-            </label>
-            <input
-              value={trainId}
-              onChange={(e) => setTrainId(e.target.value)}
-              className="w-full border px-3 py-2 rounded mb-4"
-            />
-
-            <button
-              onClick={handleJoin}
-              disabled={loading}
-              className="w-full bg-indigo-600 text-white py-2 rounded hover:bg-indigo-700"
-            >
-              {loading ? "Joining..." : "Join Queue"}
-            </button>
-          </>
-        ) : (
-          <div className="text-center space-y-4">
-            <p className="text-lg">
-              Status: <span className="font-semibold">{status}</span>
-            </p>
-            <p className="text-lg">
-              Position: <span className="font-semibold">{position}</span>
-            </p>
-            <p className="text-sm text-gray-500">
-              Checking status every 3 seconds...
-            </p>
-          </div>
-        )}
-
-      </div>
+    <div className="w-full flex-1 flex flex-col pt-8">
+      {!joined ? (
+         <div className="max-w-3xl mx-auto w-full">
+            <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+              <div className="bg-gradient-to-r from-indigo-600 to-purple-600 p-8 sm:p-10 text-white">
+                <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight mb-4">Secure your Tatkal seat</h1>
+                <p className="text-indigo-100 text-lg max-w-xl">Enter the Train ID below to join the priority queue. Once the window opens, you'll be redirected instantly to lock your seats.</p>
+              </div>
+              <div className="p-8 sm:p-10">
+                <div className="max-w-md">
+                   <div className="flex gap-4 items-end">
+                     <div className="flex-1">
+                        <Input
+                          label="Train ID"
+                          value={trainId}
+                          onChange={(e) => setTrainId(e.target.value)}
+                          placeholder="e.g. trainA"
+                          className="text-lg font-semibold uppercase font-mono"
+                        />
+                     </div>
+                     <Button 
+                        onClick={handleJoin} 
+                        disabled={loading || !trainId.trim()} 
+                        variant="accent"
+                        size="md"
+                        className="mb-[2px] h-11"
+                     >
+                        {loading ? "Joining..." : "Join Queue"}
+                     </Button>
+                   </div>
+                   <p className="mt-4 text-sm text-slate-500">
+                     Our automated polling ensures you enter the seat selection map exactly when the booking window turns active.
+                   </p>
+                </div>
+              </div>
+            </div>
+         </div>
+      ) : (
+         <div className="flex-1 flex flex-col items-center justify-center -mt-10">
+            <div className="bg-white p-10 rounded-2xl shadow-xl border border-slate-100 max-w-md w-full text-center relative overflow-hidden">
+              {/* Animated background gradient */}
+              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-orange-500 animate-[pulse_2s_ease-in-out_infinite]"></div>
+              
+              <Loader text="Waiting for Tatkal window..." />
+              
+              <div className="mt-8 grid grid-cols-2 gap-4 border-t border-slate-100 pt-8">
+                <div className="bg-slate-50 p-4 rounded-xl">
+                  <p className="text-xs text-slate-500 uppercase tracking-wider font-semibold mb-1">Status</p>
+                  <p className={`text-xl font-bold ${status === 'WAITING' ? 'text-amber-500' : 'text-indigo-600'}`}>
+                    {status || "POLLING..."}
+                  </p>
+                </div>
+                <div className="bg-slate-50 p-4 rounded-xl">
+                  <p className="text-xs text-slate-500 uppercase tracking-wider font-semibold mb-1">Queue Pos</p>
+                  <p className="text-xl font-bold text-slate-900">
+                    #{position || "..."}
+                  </p>
+                </div>
+              </div>
+            </div>
+         </div>
+      )}
     </div>
   );
 }

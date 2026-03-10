@@ -1,11 +1,26 @@
-import React from 'react'
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Button } from '../components/ui/Button';
 
-const History = () => {
+export default function History() {
+  const navigate = useNavigate();
+
   return (
-    <div>
-      History Page
+    <div className="flex-1 flex flex-col justify-center items-center p-4 sm:p-8 w-full">
+      <div className="bg-white p-10 mt-10 sm:mt-0 rounded-3xl shadow-sm border border-slate-100 max-w-lg w-full text-center">
+        <div className="w-20 h-20 bg-indigo-50 rounded-full flex items-center justify-center mx-auto mb-6">
+          <svg className="w-10 h-10 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+          </svg>
+        </div>
+        <h2 className="text-2xl font-bold text-slate-900 mb-3">No Bookings Yet</h2>
+        <p className="text-slate-500 mb-8 max-w-sm mx-auto leading-relaxed">
+          You haven't made any Tatkal bookings. Your confirmed tickets will appear here once you successfully lock and book seats.
+        </p>
+        <Button onClick={() => navigate('/queue')} variant="primary" size="lg" className="w-full sm:w-auto">
+          Find a Train
+        </Button>
+      </div>
     </div>
-  )
+  );
 }
-
-export default History
