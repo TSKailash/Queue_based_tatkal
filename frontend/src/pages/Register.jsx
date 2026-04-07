@@ -8,6 +8,9 @@ export default function Register() {
   const navigate = useNavigate();
 
   const [form, setForm] = useState({ name: "", email: "", password: "" });
+  const [step, setStep] = useState(1);
+  const [otp, setOtp] = useState("");
+  const [registeredEmail, setRegisteredEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -22,10 +25,28 @@ export default function Register() {
 
     try {
       await axios.post("/auth/register", form);
-      setSuccess("Account created successfully! Redirecting...");
-      setTimeout(() => navigate("/"), 1500);
+      setRegisteredEmail(form.email);
+      setSuccess("Account created! Please check your email for the verification code.");
+      setStep(2);
     } catch (err) {
       setError(err.response?.data?.message || "Registration failed");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleVerify = async (e) => {
+    e.preventDefault();
+    setError("");
+    setSuccess("");
+    setLoading(true);
+
+    try {
+      await axios.post("/auth/verify-email", { email: registeredEmail, code: otp });
+      setSuccess("Email verified successfully! Redirecting to login...");
+      setTimeout(() => navigate("/"), 1500);
+    } catch (err) {
+      setError(err.response?.data?.message || "Verification failed");
     } finally {
       setLoading(false);
     }
@@ -68,8 +89,12 @@ export default function Register() {
           </div>
 
           <div className="text-center lg:text-left mb-8">
-            <h2 className="text-3xl font-bold tracking-tight text-slate-900">Create an account</h2>
-            <p className="mt-2 text-sm text-slate-600">Enter your details to register.</p>
+            <h2 className="text-3xl font-bold tracking-tight text-slate-900">
+              {step === 1 ? "Create an account" : "Verify your email"}
+            </h2>
+            <p className="mt-2 text-sm text-slate-600">
+              {step === 1 ? "Enter your details to register." : "Enter the 6-digit code sent to your email."}
+            </p>
           </div>
 
           {error && (
@@ -84,48 +109,75 @@ export default function Register() {
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-5 flex flex-col">
-            <Input
-              label="Full name"
-              type="text"
-              name="name"
-              required
-              value={form.name}
-              onChange={handleChange}
-              placeholder="John Doe"
-            />
-            <Input
-              label="Email address"
-              type="email"
-              name="email"
-              required
-              value={form.email}
-              onChange={handleChange}
-              placeholder="you@example.com"
-            />
-            <Input
-              label="Password"
-              type="password"
-              name="password"
-              required
-              value={form.password}
-              onChange={handleChange}
-              placeholder="••••••••"
-            />
-            
-            <div className="pt-2">
-              <Button type="submit" className="w-full" isLoading={loading} variant="primary" size="lg">
-                Create Account
-              </Button>
-            </div>
-          </form>
+          {step === 1 ? (
+            <form onSubmit={handleSubmit} className="space-y-5 flex flex-col">
+              <Input
+                label="Full name"
+                type="text"
+                name="name"
+                required
+                value={form.name}
+                onChange={handleChange}
+                placeholder="John Doe"
+              />
+              <Input
+                label="Email address"
+                type="email"
+                name="email"
+                required
+                value={form.email}
+                onChange={handleChange}
+                placeholder="you@example.com"
+              />
+              <Input
+                label="Password"
+                type="password"
+                name="password"
+                required
+                value={form.password}
+                onChange={handleChange}
+                placeholder="••••••••"
+              />
+              
+              <div className="pt-2">
+                <Button type="submit" className="w-full" isLoading={loading} variant="primary" size="lg">
+                  Create Account
+                </Button>
+              </div>
+            </form>
+          ) : (
+            <form onSubmit={handleVerify} className="space-y-5 flex flex-col">
+              <Input
+                label="Verification Code"
+                type="text"
+                name="otp"
+                required
+                value={otp}
+                onChange={(e) => setOtp(e.target.value)}
+                placeholder="123456"
+                maxLength={6}
+                className="text-center tracking-widest text-xl font-bold"
+              />
+              
+              <div className="pt-2">
+                <Button type="submit" className="w-full" isLoading={loading} variant="primary" size="lg">
+                  Verify Code
+                </Button>
+              </div>
+              <p className="mt-4 text-center text-sm text-slate-600">
+                Didn't receive the code? Wait a moment or check your spam folder.
+              </p>
+            </form>
+          )}
 
-          <p className="mt-8 text-center text-sm text-slate-600">
-            Already have an account?{" "}
-            <Link to="/" className="font-semibold text-indigo-600 hover:text-indigo-500 transition-colors">
-              Sign in instead
-            </Link>
-          </p>
+          {step === 1 && (
+            <p className="mt-8 text-center text-sm text-slate-600">
+              Already have an account?{" "}
+              <Link to="/" className="font-semibold text-indigo-600 hover:text-indigo-500 transition-colors">
+                Sign in instead
+              </Link>
+            </p>
+          )}
         </div>
       </div>
     </div>
