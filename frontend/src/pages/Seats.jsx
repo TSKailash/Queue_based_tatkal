@@ -105,6 +105,18 @@ export default function SeatPage() {
     }
   };
 
+  const optOut = async () => {
+    try {
+      setLoading(true);
+      await api.post(`/queue/optout/${trainId}`);
+      navigate("/queue");
+    } catch (err) {
+      alert(err.response?.data?.message || "Opt-out failed");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const getSeatStyle = (seatId) => {
     const seat = seats[seatId];
     const base = "relative flex items-center justify-center h-16 rounded-xl border-2 font-bold cursor-pointer transition-all duration-200 transform hover:scale-105 active:scale-95 text-sm sm:text-base select-none";
@@ -186,6 +198,14 @@ export default function SeatPage() {
            </div>
            
            <div className="flex gap-3 w-full sm:w-auto">
+              <Button 
+                variant="accent" 
+                onClick={optOut} 
+                isLoading={loading}
+                className="flex-1 sm:flex-none text-sm sm:text-base py-3 !bg-rose-100 !text-rose-700 hover:!bg-rose-200 !border-rose-200 border"
+              >
+                Opt-out
+              </Button>
               <Button 
                 variant="accent" 
                 onClick={lockSeats} 

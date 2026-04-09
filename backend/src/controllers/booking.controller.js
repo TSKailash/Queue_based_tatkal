@@ -81,8 +81,8 @@ export async function myBookings(req, res){
         .sort({ createdAt: -1 });
 
         return res.json({
-        count: bookings.length,
-        bookings
+            count: bookings.length,
+            bookings
         });
 
     } catch (err) {

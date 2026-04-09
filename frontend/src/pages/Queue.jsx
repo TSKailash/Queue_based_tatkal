@@ -64,13 +64,20 @@ export default function Queue() {
                 <div className="max-w-md">
                    <div className="flex gap-4 items-end">
                      <div className="flex-1">
-                        <Input
-                          label="Train ID"
-                          value={trainId}
-                          onChange={(e) => setTrainId(e.target.value)}
-                          placeholder="e.g. trainA"
-                          className="text-lg font-semibold uppercase font-mono"
-                        />
+                        <div className="flex flex-col gap-1.5 text-left">
+                          <label className="text-sm font-medium text-slate-700">Select Train</label>
+                          <select
+                            value={trainId}
+                            onChange={(e) => setTrainId(e.target.value)}
+                            className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all text-slate-800 font-semibold uppercase font-mono h-11"
+                          >
+                            <option value="trainA">Shatabdi Exp (trainA)</option>
+                            <option value="trainB">Rajdhani Exp (trainB)</option>
+                            <option value="trainC">Vande Bharat (trainC)</option>
+                            <option value="trainD">Duronto Exp (trainD)</option>
+                            <option value="trainE">Garib Rath (trainE)</option>
+                          </select>
+                        </div>
                      </div>
                      <Button 
                         onClick={handleJoin} 
