@@ -23,7 +23,7 @@ export default function SeatPage() {
     } catch (err) {
       console.error("Failed to fetch seats");
     } finally {
-      if(initialLoad) setInitialLoad(false);
+      setInitialLoad(false);
     }
   };
 
@@ -47,16 +47,17 @@ export default function SeatPage() {
     const interval = setInterval(() => {
       fetchSeats();
       fetchActiveStatus();
-    }, 3000);
+    }, 1500);
 
     return () => clearInterval(interval);
   }, []);
 
   useEffect(() => {
-    if (remainingTime <= 0) return;
-    const timer = setInterval(() => setRemainingTime((prev) => prev - 1), 1000);
+    const timer = setInterval(() => {
+      setRemainingTime((prev) => (prev > 0 ? prev - 1 : 0));
+    }, 1000);
     return () => clearInterval(timer);
-  }, [remainingTime]);
+  }, []);
 
   const handleSeatClick = (seatId) => {
     const seat = seats[seatId];

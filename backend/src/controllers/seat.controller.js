@@ -63,6 +63,10 @@ export async function lockSeats(req, res) {
   if (!Array.isArray(seats) || seats.length === 0) {
     return res.status(400).json({ message: "Seats required" });
   }
+  
+  if (seats.length > 6) {
+    return res.status(400).json({ message: "Maximum 6 seats allowed" });
+  }
 
   const activeKey = redisKeys.activeUser(trainId);
   const activeUser = await redis.get(activeKey);

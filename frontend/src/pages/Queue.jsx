@@ -46,7 +46,7 @@ export default function Queue() {
       } catch (err) {
         console.log("Polling error");
       }
-    }, 3000);
+    }, 1500);
 
     return () => clearInterval(interval);
   }, [joined, trainId, navigate]);
