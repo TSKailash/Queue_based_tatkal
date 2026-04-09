@@ -1,8 +1,6 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import axios from "../api/axios";
-import { Button } from "../components/ui/Button";
-import { Input } from "../components/ui/Input";
 
 export default function Register() {
   const navigate = useNavigate();
@@ -26,10 +24,10 @@ export default function Register() {
     try {
       await axios.post("/auth/register", form);
       setRegisteredEmail(form.email);
-      setSuccess("Account created! Please check your email for the verification code.");
+      setSuccess("Account instantiated. Verification required.");
       setStep(2);
     } catch (err) {
-      setError(err.response?.data?.message || "Registration failed");
+      setError(err.response?.data?.message || "Registration failed. Verify input block.");
     } finally {
       setLoading(false);
     }
@@ -43,140 +41,146 @@ export default function Register() {
 
     try {
       await axios.post("/auth/verify-email", { email: registeredEmail, code: otp });
-      setSuccess("Email verified successfully! Redirecting to login...");
+      setSuccess("Verification acquired. Redirecting...");
       setTimeout(() => navigate("/login"), 1500);
     } catch (err) {
-      setError(err.response?.data?.message || "Verification failed");
+      setError(err.response?.data?.message || "Verification code INVALID.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex text-slate-900">
-      {/* Left side brand area */}
-      <div className="hidden lg:flex lg:w-1/2 relative bg-indigo-900 overflow-hidden">
-        {/* Background gradient decoration */}
-        <div className="absolute inset-0 bg-gradient-to-br from-indigo-900 via-blue-800 to-indigo-600 opacity-90 mix-blend-multiply"></div>
-        <div className="absolute top-0 right-0 w-[500px] h-[500px] rounded-full bg-blue-500 blur-3xl opacity-20 transform translate-x-1/2 -translate-y-1/2"></div>
-        <div className="absolute bottom-20 left-20 w-80 h-80 rounded-full bg-orange-500 blur-3xl opacity-20"></div>
+    <div className="min-h-screen flex bg-slate-900 justify-center items-center p-4 py-12">
+      
+      <div className="w-full max-w-5xl bg-white border-4 border-slate-900 flex flex-col md:flex-row shadow-[8px_8px_0_0_#059669]">
         
-        <div className="relative z-10 flex flex-col justify-center px-16 w-full max-w-2xl mx-auto h-full text-white">
-          <div className="flex items-center gap-2 mb-8 cursor-pointer">
-            <svg className="w-10 h-10 text-orange-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-            </svg>
-            <span className="font-bold text-3xl tracking-tight">Tatkal<span className="text-orange-400">Sync</span></span>
-          </div>
-          <h1 className="text-5xl font-extrabold tracking-tight mb-6 leading-tight">
-            Join the winning queue.
-          </h1>
-          <p className="text-lg text-indigo-100 max-w-xl leading-relaxed">
-            Create an account to access our optimized Tatkal booking engine. Beat the rush with our streamlined interface and instant validations.
-          </p>
-        </div>
-      </div>
-
-      {/* Right side form area */}
-      <div className="flex-1 flex flex-col justify-center px-4 sm:px-6 lg:px-20 xl:px-24 bg-white">
-        <div className="mx-auto w-full max-w-sm lg:max-w-md">
-          {/* Mobile brand header */}
-          <div className="flex items-center gap-2 mb-8 lg:hidden justify-center">
-            <svg className="w-8 h-8 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-            </svg>
-            <span className="font-bold text-2xl tracking-tight text-slate-900">Tatkal<span className="text-indigo-600">Sync</span></span>
-          </div>
-
-          <div className="text-center lg:text-left mb-8">
-            <h2 className="text-3xl font-bold tracking-tight text-slate-900">
-              {step === 1 ? "Create an account" : "Verify your email"}
-            </h2>
-            <p className="mt-2 text-sm text-slate-600">
-              {step === 1 ? "Enter your details to register." : "Enter the 6-digit code sent to your email."}
+        {/* Left Branding Panel */}
+        <div className="w-full md:w-1/2 bg-slate-900 text-white p-12 border-r-4 border-slate-900 flex flex-col justify-between">
+          <div>
+            <div className="mb-8 inline-block bg-emerald-600 px-3 py-1 font-black uppercase tracking-widest text-sm border-2 border-slate-900">
+              Registration
+            </div>
+            <h1 className="text-4xl md:text-5xl font-black uppercase tracking-tighter leading-none mb-6">
+              Create <br/> Operator <br/> Instance
+            </h1>
+            <p className="text-lg text-slate-400 font-medium">
+              Initialize a dedicated connection profile to access priority queue systems safely and reliably. 
             </p>
           </div>
 
+          <div className="mt-12 pt-8 border-t-2 border-slate-700">
+             <div className="w-full h-8 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHBhdGggZD0iTTAgMGg0djQwaC00em0xMCAwaDR2NDBoLTR6TTIwIDB2NDBoNHYtNDB6bTEwIDB2NDBoNHYtNDB6IiBmaWxsPSIjMzMzIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiLz48L3N2Zz4=')] opacity-30"></div>
+          </div>
+        </div>
+
+        {/* Right Register Panel */}
+        <div className="w-full md:w-1/2 p-12 bg-white">
+          <div className="mb-10">
+            <h2 className="text-2xl font-black text-slate-900 uppercase tracking-widest">
+               {step === 1 ? "Initialize Profile" : "Authenticate"}
+            </h2>
+            <div className="w-12 h-1 bg-emerald-600 mt-4"></div>
+          </div>
+
           {error && (
-            <div className="mb-6 rounded-lg bg-red-50 p-4 border border-red-200">
-              <h3 className="text-sm font-medium text-red-800">{error}</h3>
+            <div className="mb-8 bg-slate-900 text-white p-4 font-bold border-l-4 border-red-500 uppercase tracking-widest text-sm">
+              Alert: {error}
             </div>
           )}
           
           {success && (
-            <div className="mb-6 rounded-lg bg-green-50 p-4 border border-green-200">
-              <h3 className="text-sm font-medium text-green-800">{success}</h3>
+            <div className="mb-8 bg-slate-50 text-slate-900 p-4 font-bold border-l-4 border-emerald-600 uppercase tracking-widest text-sm">
+              Status: {success}
             </div>
           )}
 
           {step === 1 ? (
-            <form onSubmit={handleSubmit} className="space-y-5 flex flex-col">
-              <Input
-                label="Full name"
-                type="text"
-                name="name"
-                required
-                value={form.name}
-                onChange={handleChange}
-                placeholder="John Doe"
-              />
-              <Input
-                label="Email address"
-                type="email"
-                name="email"
-                required
-                value={form.email}
-                onChange={handleChange}
-                placeholder="you@example.com"
-              />
-              <Input
-                label="Password"
-                type="password"
-                name="password"
-                required
-                value={form.password}
-                onChange={handleChange}
-                placeholder="••••••••"
-              />
-              
-              <div className="pt-2">
-                <Button type="submit" className="w-full" isLoading={loading} variant="primary" size="lg">
-                  Create Account
-                </Button>
-              </div>
-            </form>
+             <form onSubmit={handleSubmit} className="space-y-6">
+               <div>
+                 <label className="block text-xs font-black text-slate-900 uppercase tracking-widest mb-2">Legal Identity</label>
+                 <input
+                   type="text"
+                   name="name"
+                   required
+                   value={form.name}
+                   onChange={handleChange}
+                   placeholder="JOHN DOE"
+                   className="w-full px-4 py-4 bg-slate-100 border-2 border-slate-900 focus:outline-none focus:bg-emerald-50 transition-none rounded-none text-slate-900 font-bold uppercase"
+                 />
+               </div>
+               <div>
+                 <label className="block text-xs font-black text-slate-900 uppercase tracking-widest mb-2">Operator ID (Email)</label>
+                 <input
+                   type="email"
+                   name="email"
+                   required
+                   value={form.email}
+                   onChange={handleChange}
+                   placeholder="operator@system.com"
+                   className="w-full px-4 py-4 bg-slate-100 border-2 border-slate-900 focus:outline-none focus:bg-emerald-50 transition-none rounded-none text-slate-900 font-bold"
+                 />
+               </div>
+               <div>
+                 <label className="block text-xs font-black text-slate-900 uppercase tracking-widest mb-2">Security Key</label>
+                 <input
+                   type="password"
+                   name="password"
+                   required
+                   value={form.password}
+                   onChange={handleChange}
+                   placeholder="••••••••"
+                   className="w-full px-4 py-4 bg-slate-100 border-2 border-slate-900 focus:outline-none focus:bg-emerald-50 transition-none rounded-none text-slate-900 font-bold tracking-widest"
+                 />
+               </div>
+               
+               <div className="pt-6">
+                 <button 
+                   type="submit" 
+                   disabled={loading}
+                   className="w-full bg-slate-900 text-white font-black uppercase tracking-widest py-4 border-2 border-slate-900 hover:bg-emerald-600 transition-none disabled:opacity-50"
+                 >
+                   {loading ? "Processing..." : "Generate Instance"}
+                 </button>
+               </div>
+             </form>
           ) : (
-            <form onSubmit={handleVerify} className="space-y-5 flex flex-col">
-              <Input
-                label="Verification Code"
-                type="text"
-                name="otp"
-                required
-                value={otp}
-                onChange={(e) => setOtp(e.target.value)}
-                placeholder="123456"
-                maxLength={6}
-                className="text-center tracking-widest text-xl font-bold"
-              />
-              
-              <div className="pt-2">
-                <Button type="submit" className="w-full" isLoading={loading} variant="primary" size="lg">
-                  Verify Code
-                </Button>
-              </div>
-              <p className="mt-4 text-center text-sm text-slate-600">
-                Didn't receive the code? Wait a moment or check your spam folder.
-              </p>
-            </form>
+             <form onSubmit={handleVerify} className="space-y-6">
+               <div>
+                 <label className="block text-xs font-black text-slate-900 uppercase tracking-widest mb-2">Access Token</label>
+                 <input
+                   type="text"
+                   name="otp"
+                   required
+                   value={otp}
+                   onChange={(e) => setOtp(e.target.value)}
+                   placeholder="------"
+                   maxLength={6}
+                   className="w-full px-4 py-6 bg-slate-100 border-2 border-slate-900 focus:outline-none focus:bg-emerald-50 transition-none rounded-none text-center text-4xl tracking-[0.5em] font-mono font-black"
+                 />
+               </div>
+               
+               <div className="pt-6">
+                 <button 
+                   type="submit" 
+                   disabled={loading}
+                   className="w-full bg-emerald-600 text-white font-black uppercase tracking-widest py-4 border-2 border-slate-900 hover:bg-slate-900 transition-none disabled:opacity-50"
+                 >
+                   {loading ? "Verifying..." : "Validate Token"}
+                 </button>
+               </div>
+             </form>
           )}
 
           {step === 1 && (
-            <p className="mt-8 text-center text-sm text-slate-600">
-              Already have an account?{" "}
-              <Link to="/login" className="font-semibold text-indigo-600 hover:text-indigo-500 transition-colors">
-                Sign in instead
-              </Link>
-            </p>
+            <div className="mt-12 pt-8 border-t-2 border-slate-200">
+              <p className="text-sm font-bold text-slate-500 uppercase tracking-widest">
+                Existing Identity?{" "}
+                <Link to="/login" className="text-slate-900 hover:bg-slate-900 hover:text-white px-2 py-1 transition-none underline md:no-underline">
+                  Return to Login
+                </Link>
+              </p>
+            </div>
           )}
         </div>
       </div>

@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from "react";
 import api from "../api/axios";
-import { Button } from "../components/ui/Button";
-import { Loader } from "../components/ui/Loader";
 
 export default function MasterList() {
   const [masterList, setMasterList] = useState([]);
@@ -22,7 +20,7 @@ export default function MasterList() {
     } finally {
       setLoading(false);
     }
-  };
+  }
 
   const handleAddPassenger = async (e) => {
     e.preventDefault();
@@ -44,102 +42,123 @@ export default function MasterList() {
       const res = await api.delete(`/user/masterlist/${id}`);
       setMasterList(res.data.masterList);
     } catch (err) {
-      alert("Failed to remote passenger");
+      alert("Failed to remove passenger");
     }
   };
 
   if (loading) {
-    return <div className="flex-1 flex justify-center items-center"><Loader text="Loading your passenger list..." /></div>;
+    return (
+      <div className="flex-1 flex justify-center items-center bg-slate-100">
+        <div className="bg-slate-900 text-white font-black uppercase tracking-widest px-6 py-3 border-2 border-slate-900">Syncing Identity Data...</div>
+      </div>
+    );
   }
 
   return (
-    <div className="flex-1 flex flex-col w-full max-w-5xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
-      <div className="mb-8 border-b border-slate-200 pb-6">
-        <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">Passenger Master List</h1>
-        <p className="text-slate-500 mt-2 font-medium">Manage your frequently traveling passengers to speed up your Tatkal checkout.</p>
+    <div className="flex-1 flex flex-col bg-slate-100">
+      
+      {/* Brutalist Title Header */}
+      <div className="bg-slate-900 border-b-8 border-slate-800 text-white p-8 sm:p-12">
+        <div className="max-w-7xl mx-auto w-full">
+           <h1 className="text-4xl sm:text-5xl font-black uppercase tracking-tighter leading-none mb-4">Identity Manifest</h1>
+           <div className="w-16 h-2 bg-emerald-600 mb-4"></div>
+           <p className="text-slate-400 font-bold uppercase tracking-widest text-xs">Operator Fast-Access Identity Cache</p>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-        {/* Add new passenger form */}
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 lg:sticky lg:top-24">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="bg-indigo-100 text-indigo-600 p-2 rounded-xl">
-              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
-              </svg>
-            </div>
-            <h2 className="text-xl font-bold text-slate-800">Add Passenger</h2>
-          </div>
+      <div className="max-w-7xl mx-auto w-full px-4 sm:px-8 py-8">
+        <div className="flex flex-col lg:flex-row gap-8 items-start">
           
-          <form onSubmit={handleAddPassenger} className="space-y-4">
-            <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-1.5">Full Name</label>
-              <input 
-                type="text" 
-                required
-                className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all font-medium text-slate-700"
-                placeholder="E.g., Rahul Sharma"
-                value={newPassenger.name}
-                onChange={(e) => setNewPassenger({...newPassenger, name: e.target.value})}
-              />
+          {/* Passenger Form */}
+          <div className="w-full lg:w-1/3 border-4 border-slate-900 bg-white">
+            <h2 className="text-lg font-black text-white bg-slate-900 p-4 uppercase tracking-widest mb-4">Append Identity</h2>
+            <div className="p-6 pt-0">
+               <form onSubmit={handleAddPassenger} className="space-y-6">
+                 <div>
+                   <label className="block text-xs font-black text-slate-900 uppercase tracking-widest mb-2">Legal Name</label>
+                   <input 
+                     type="text" 
+                     required
+                     className="w-full px-4 py-3 bg-slate-100 border-2 border-slate-900 focus:outline-none focus:bg-emerald-50 rounded-none transition-none text-slate-900 font-bold uppercase"
+                     placeholder="DATA ENTRY"
+                     value={newPassenger.name}
+                     onChange={(e) => setNewPassenger({...newPassenger, name: e.target.value})}
+                   />
+                 </div>
+                 <div>
+                   <label className="block text-xs font-black text-slate-900 uppercase tracking-widest mb-2">Recorded Age</label>
+                   <input 
+                     type="number" 
+                     required
+                     min="1"
+                     max="120"
+                     className="w-full px-4 py-3 bg-slate-100 border-2 border-slate-900 focus:outline-none focus:bg-emerald-50 rounded-none transition-none text-slate-900 font-bold"
+                     placeholder="XX"
+                     value={newPassenger.age}
+                     onChange={(e) => setNewPassenger({...newPassenger, age: e.target.value})}
+                   />
+                 </div>
+                 <div className="pt-2">
+                   <button 
+                     type="submit" 
+                     disabled={isAdding}
+                     className="w-full bg-emerald-600 text-white font-black uppercase tracking-widest py-4 border-2 border-slate-900 hover:bg-slate-900 transition-none disabled:opacity-50"
+                   >
+                     {isAdding ? "Writing Data..." : "Execute Append"}
+                   </button>
+                 </div>
+               </form>
             </div>
-            <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-1.5">Age</label>
-              <input 
-                type="number" 
-                required
-                min="1"
-                max="120"
-                className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all font-medium text-slate-700"
-                placeholder="E.g., 28"
-                value={newPassenger.age}
-                onChange={(e) => setNewPassenger({...newPassenger, age: e.target.value})}
-              />
-            </div>
-            <div className="pt-2">
-              <Button type="submit" variant="primary" className="w-full" isLoading={isAdding}>
-                Save Passenger
-              </Button>
-            </div>
-          </form>
-        </div>
+          </div>
 
-        {/* Passenger List */}
-        <div className="lg:col-span-2">
-          {masterList.length === 0 ? (
-            <div className="bg-slate-50 border border-dashed border-slate-300 rounded-2xl flex flex-col items-center justify-center p-12 text-center h-full">
-              <svg className="w-16 h-16 text-slate-300 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-              </svg>
-              <h3 className="text-lg font-bold text-slate-700 mb-1">Your list is empty</h3>
-              <p className="text-slate-500 text-sm max-w-xs">Add standard travelers here. They'll be available instantly during the Tatkal checkout.</p>
+          {/* Passenger Data Table */}
+          <div className="w-full lg:w-2/3 border-4 border-slate-900 bg-white">
+            <div className="p-4 bg-slate-900 border-b-4 border-slate-900 flex items-center justify-between">
+              <h2 className="text-lg font-black text-white uppercase tracking-widest">Active Manifest</h2>
+              <span className="bg-emerald-600 text-white px-3 py-1 text-xs font-black uppercase tracking-widest shadow-[2px_2px_0_0_#94a3b8]">
+                {masterList.length} Entries
+              </span>
             </div>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {masterList.map((passenger) => (
-                <div key={passenger._id} className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm hover:shadow-md transition-shadow relative group">
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-indigo-50 rounded-full flex items-center justify-center text-indigo-600 font-bold text-lg border border-indigo-100 flex-shrink-0">
-                      {passenger.name.charAt(0).toUpperCase()}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-bold text-slate-900 truncate">{passenger.name}</p>
-                      <p className="text-sm font-medium text-slate-500">{passenger.age} Years Old</p>
-                    </div>
-                  </div>
-                  <button 
-                    onClick={() => handleRemovePassenger(passenger._id)}
-                    className="absolute top-4 right-4 text-slate-400 hover:text-rose-500 hover:bg-rose-50 p-1.5 rounded-lg transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100"
-                    title="Remove Passenger"
-                  >
-                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
+            
+            {masterList.length === 0 ? (
+              <div className="p-12 text-center text-slate-500 font-bold uppercase tracking-widest bg-slate-100">
+                NO IDENTITY DATA FOUND ON THIS NODE.
+              </div>
+            ) : (
+              <div className="overflow-x-auto w-full">
+                <table className="w-full text-left bg-white min-w-[500px]">
+                  <thead>
+                    <tr className="bg-slate-200 border-b-4 border-slate-900 text-xs text-slate-900 font-black uppercase tracking-widest">
+                      <th className="px-6 py-4 border-r-2 border-slate-300">Identity Tag</th>
+                      <th className="px-6 py-4 border-r-2 border-slate-300">Life Factor</th>
+                      <th className="px-6 py-4 text-center">Protocol</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y-2 divide-slate-300">
+                    {masterList.map((passenger, idx) => (
+                      <tr key={passenger._id} className={`hover:bg-emerald-50 transition-none ${idx % 2 !== 0 ? 'bg-slate-50' : 'bg-white'}`}>
+                        <td className="px-6 py-4 text-base font-black text-slate-900 uppercase border-r-2 border-slate-300 align-middle">
+                          {passenger.name}
+                        </td>
+                        <td className="px-6 py-4 text-sm font-bold text-slate-700 uppercase border-r-2 border-slate-300 align-middle">
+                          {passenger.age} YRS
+                        </td>
+                        <td className="px-6 py-4 align-middle bg-slate-100 text-center">
+                          <button 
+                            onClick={() => handleRemovePassenger(passenger._id)}
+                            className="bg-slate-900 text-white text-xs font-black uppercase tracking-widest px-4 py-2 hover:bg-red-600 border-2 border-slate-900 transition-none"
+                          >
+                            Purge
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+
         </div>
       </div>
     </div>

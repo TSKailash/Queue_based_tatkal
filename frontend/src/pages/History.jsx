@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button } from '../components/ui/Button';
-import { Loader } from '../components/ui/Loader';
 import api from '../api/axios';
 
 export default function History() {
@@ -24,153 +22,145 @@ export default function History() {
   }, []);
 
   if (loading) {
-    return <div className="flex-1 flex justify-center items-center"><Loader text="Loading your boarding passes..." /></div>;
+    return (
+      <div className="flex-1 flex justify-center items-center bg-slate-100">
+        <div className="bg-slate-900 text-white font-black uppercase tracking-widest px-6 py-3 border-2 border-slate-900">Retrieving Archive...</div>
+      </div>
+    );
   }
 
   const getTrainName = (id) => {
     const map = {
-      trainA: 'Shatabdi Exp',
-      trainB: 'Rajdhani Exp',
-      trainC: 'Vande Bharat',
-      trainD: 'Duronto Exp',
-      trainE: 'Garib Rath'
+      trainA: 'SHATABDI EXP',
+      trainB: 'RAJDHANI EXP',
+      trainC: 'VANDE BHARAT',
+      trainD: 'DURONTO EXP',
+      trainE: 'GARIB RATH'
     };
     return map[id] || id;
   };
 
   return (
-    <div className="flex-1 flex flex-col p-4 sm:p-8 w-full max-w-4xl mx-auto pb-20">
-      <div className="flex justify-between items-center mb-10">
-        <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">Boarding Passes</h1>
-        <Button onClick={() => navigate('/queue')} variant="primary" className="shadow-lg shadow-indigo-200">Book New</Button>
+    <div className="flex-1 flex flex-col bg-slate-100">
+      
+      <div className="bg-slate-900 border-b-8 border-slate-800 text-white p-8 sm:p-12 mb-8">
+        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6">
+           <div>
+              <h1 className="text-4xl sm:text-5xl font-black uppercase tracking-tighter leading-none mb-4">Operation Ledger</h1>
+              <div className="w-16 h-2 bg-emerald-600 mb-4"></div>
+              <p className="text-slate-400 font-bold uppercase tracking-widest text-xs">Historical validation of past network reservations.</p>
+           </div>
+           <button 
+             onClick={() => navigate('/')} 
+             className="bg-emerald-600 text-white font-black uppercase tracking-widest py-3 px-6 border-2 border-emerald-600 hover:bg-slate-900 transition-none shadow-[4px_4px_0_0_#94a3b8] sm:shadow-[4px_4px_0_0_#0f172a]"
+           >
+             Initialize New Request
+           </button>
+        </div>
       </div>
 
-      {bookings.length === 0 ? (
-        <div className="bg-white p-10 mt-4 rounded-3xl shadow-sm border border-slate-100 max-w-lg w-full mx-auto text-center">
-          <div className="w-20 h-20 bg-indigo-50 rounded-full flex items-center justify-center mx-auto mb-6">
-            <svg className="w-10 h-10 text-indigo-500 hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
-            </svg>
+      <div className="max-w-6xl mx-auto w-full px-4 sm:px-8 pb-24">
+        {bookings.length === 0 ? (
+          <div className="bg-white p-12 border-4 border-slate-900 shadow-[8px_8px_0_0_#0f172a]">
+            <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tighter mb-4">ARCHIVE EMPTY</h2>
+            <p className="text-slate-600 font-bold text-sm uppercase tracking-widest mb-8">No historical ticket data registered by this operational instance.</p>
+            <button 
+              onClick={() => navigate('/')} 
+              className="bg-slate-900 text-white font-black uppercase tracking-widest py-3 px-8 border-2 border-slate-900 hover:bg-emerald-600 transition-none"
+            >
+              QUERY SECTORS
+            </button>
           </div>
-          <h2 className="text-2xl font-bold text-slate-900 mb-3">No Boarding Passes</h2>
-          <p className="text-slate-500 mb-8 max-w-sm mx-auto leading-relaxed">
-            Your travel history is empty. Your flight-styled train tickets will securely appear here once booked.
-          </p>
-          <Button onClick={() => navigate('/queue')} variant="accent" size="lg" className="w-full sm:w-auto">
-            Find a Train
-          </Button>
-        </div>
-      ) : (
-        <div className="flex flex-col gap-8 w-full block">
-          {bookings.map((booking) => (
-            booking.passengers && booking.passengers.length > 0 ? (
-              booking.passengers.map((passenger, idx) => (
-                <div key={`${booking._id}-${idx}`} className="flex flex-col sm:flex-row bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-200 overflow-hidden relative transition-transform hover:-translate-y-1 duration-300 w-full group">
-                  
-                  {/* Left Stub - Barcode */}
-                  <div className="bg-indigo-600 sm:w-48 p-6 flex flex-col justify-between relative overflow-hidden group-hover:bg-indigo-700 transition-colors">
-                    {/* Decorative Perforation Line */}
-                    <div className="hidden sm:block absolute right-0 top-0 bottom-0 w-[2px] border-r-2 border-dashed border-white/40"></div>
+        ) : (
+          <div className="flex flex-col gap-10">
+            {bookings.map((booking) => (
+              booking.passengers && booking.passengers.length > 0 ? (
+                booking.passengers.map((passenger, idx) => (
+                  <div key={`${booking._id}-${idx}`} className="bg-white border-4 border-slate-900 shadow-[8px_8px_0_0_#059669] flex flex-col sm:flex-row relative">
                     
-                    <div className="z-10">
-                      <p className="text-indigo-200 text-xs font-bold tracking-widest uppercase mb-1 flex items-center gap-2">
-                        <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                        </svg>
-                        Confirmed
-                      </p>
-                      <h3 className="text-white text-2xl font-bold font-mono tracking-tight leading-none mb-4">{booking.trainId}</h3>
-                      <div className="bg-white/20 px-2 py-1 inline-block rounded text-white text-xs font-mono font-medium backdrop-blur-sm">
-                        {booking._id.substring(booking._id.length - 6).toUpperCase()}
+                    {/* Security Band */}
+                    <div className="hidden lg:block w-8 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHBhdGggZD0iTTAgMGg0djQwaC00em0xMCAwaDR2NDBoLTR6TTIwIDB2NDBoNHYtNDB6bTEwIDB2NDBoNHYtNDB6IiBmaWxsPSIjY2JkNWUxIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiLz48L3N2Zz4=')] border-r-4 border-slate-900"></div>
+
+                    {/* Meta Data Block */}
+                    <div className="bg-slate-900 sm:w-64 p-6 sm:p-8 border-b-4 sm:border-b-0 sm:border-r-4 border-slate-900 flex flex-col justify-between text-white relative overflow-hidden">
+                      <div className="z-10 relative">
+                        <div className="text-[10px] font-black text-emerald-500 uppercase tracking-widest mb-1 shadow-black">IDENTIFIER / PNR</div>
+                        <div className="text-2xl font-mono font-black tracking-tight">{booking._id.substring(booking._id.length - 10).toUpperCase()}</div>
                       </div>
-                    </div>
-                    
-                    {/* Mock Barcode */}
-                    <div className="mt-8 opacity-80 z-10 flex flex-col gap-1 w-full mix-blend-overlay">
-                       <svg className="w-full h-12" preserveAspectRatio="none" viewBox="0 0 100 100">
-                          <rect x="0" y="0" width="4" height="100" fill="white"/>
-                          <rect x="6" y="0" width="2" height="100" fill="white"/>
-                          <rect x="10" y="0" width="8" height="100" fill="white"/>
-                          <rect x="22" y="0" width="2" height="100" fill="white"/>
-                          <rect x="26" y="0" width="6" height="100" fill="white"/>
-                          <rect x="36" y="0" width="6" height="100" fill="white"/>
-                          <rect x="46" y="0" width="2" height="100" fill="white"/>
-                          <rect x="52" y="0" width="10" height="100" fill="white"/>
-                          <rect x="66" y="0" width="4" height="100" fill="white"/>
-                          <rect x="74" y="0" width="2" height="100" fill="white"/>
-                          <rect x="80" y="0" width="8" height="100" fill="white"/>
-                          <rect x="92" y="0" width="8" height="100" fill="white"/>
-                       </svg>
-                       <div className="text-[10px] text-white/70 font-mono tracking-widest text-center">{booking._id}</div>
+                      
+                      <div className="mt-8 z-10 relative">
+                        <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">AUTH STATUS</div>
+                        <div className="inline-block px-3 py-1 bg-emerald-600 text-white text-sm font-black uppercase tracking-widest border-2 border-white">
+                          APPROVED
+                        </div>
+                      </div>
+
+                      <div className="mt-8 pt-6 border-t-2 border-slate-700 z-10 relative">
+                         <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">TXN HASH</div>
+                         <div className="text-xs font-mono text-slate-300 truncate">{booking._id}</div>
+                      </div>
+                      
+                      {/* Big watermark inside dark block */}
+                      <div className="absolute right-[-40px] bottom-[-40px] text-slate-800 opacity-50 font-black text-9xl pointer-events-none select-none overflow-hidden">TK</div>
                     </div>
 
-                    {/* Gradient overlay */}
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-3xl -mr-16 -mt-16"></div>
-                  </div>
+                    {/* Primary Output Block */}
+                    <div className="p-6 sm:p-10 flex-1 flex flex-col justify-center">
+                       <div className="flex flex-col md:flex-row md:justify-between items-start mb-8 gap-6 border-b-4 border-slate-900 pb-8">
+                          <div>
+                             <div className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">SECTOR / LOCOMOTIVE</div>
+                             <h2 className="text-3xl font-black text-slate-900 uppercase tracking-tighter leading-none">{getTrainName(booking.trainId)}</h2>
+                             <span className="inline-block mt-3 text-xs font-black text-white bg-slate-900 px-2 py-1 uppercase tracking-widest border border-slate-900">{booking.trainId}</span>
+                          </div>
+                          
+                          <div className="md:text-right">
+                             <div className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">TIMESTAMP</div>
+                             <div className="text-xl font-black text-slate-900 tracking-tight">{new Date(booking.createdAt).toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' })}</div>
+                          </div>
+                       </div>
 
-                  {/* Right Main Body */}
-                  <div className="p-6 sm:p-8 flex-1 flex flex-col justify-between bg-gradient-to-br from-white to-slate-50 relative">
-                     {/* Watermark logo */}
-                     <svg className="absolute w-40 h-40 text-slate-100 -right-10 -bottom-10 opacity-50 pointer-events-none" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
-                     </svg>
-                     
-                     <div className="flex justify-between items-start mb-8 relative z-10">
-                        <div>
-                           <p className="text-xs font-bold text-slate-400 tracking-wider uppercase mb-1">Passenger Name</p>
-                           <h2 className="text-2xl font-black text-slate-800 tracking-tight">{passenger.name}</h2>
-                           <p className="text-slate-500 font-medium">{passenger.age} Years Old</p>
-                        </div>
-                        <div className="text-right">
-                           <p className="text-xs font-bold text-slate-400 tracking-wider uppercase mb-1">Seat</p>
-                           <div className="text-3xl font-black text-indigo-600 font-mono bg-indigo-50 px-3 py-1 rounded-xl border border-indigo-100 shadow-inner">
-                              {passenger.seat}
-                           </div>
-                        </div>
-                     </div>
+                       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                          <div className="md:col-span-2">
+                             <div className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">IDENTITY MARKER</div>
+                             <div className="text-2xl font-black text-slate-900 uppercase leading-none">{passenger.name}</div>
+                             <div className="text-xs font-bold text-slate-500 mt-2 uppercase tracking-widest">{passenger.age} EARTH YEARS</div>
+                          </div>
 
-                     <div className="border-t border-slate-200/60 pt-4 flex justify-between items-end relative z-10">
-                        <div>
-                           <p className="text-xs font-bold text-slate-400 tracking-wider uppercase mb-1">Train</p>
-                           <p className="text-lg font-bold text-slate-700">{getTrainName(booking.trainId)}</p>
-                        </div>
-                        <div className="text-right">
-                           <p className="text-xs font-bold text-slate-400 tracking-wider uppercase mb-1">Date</p>
-                           <p className="text-sm font-semibold text-slate-700">{new Date(booking.createdAt).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' })}</p>
-                        </div>
-                     </div>
+                          <div>
+                             <div className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">TARGET CLS</div>
+                             <div className="text-3xl font-black text-slate-900 leading-none">CC</div>
+                          </div>
+
+                          <div className="bg-slate-100 border-2 border-slate-900 p-3 text-center">
+                             <div className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">NODE</div>
+                             <div className="text-3xl font-mono font-black text-emerald-600 tracking-tighter">{passenger.seat}</div>
+                          </div>
+                       </div>
+                    </div>
                   </div>
-                  
-                  {/* Outer cutouts styling */}
-                  <div className="hidden sm:block absolute top-0 -mt-3 right-[calc(100%-12rem-12px)] w-6 h-6 bg-slate-50 border-b border-slate-200 rounded-full"></div>
-                  <div className="hidden sm:block absolute bottom-0 -mb-3 right-[calc(100%-12rem-12px)] w-6 h-6 bg-slate-50 border-t border-slate-200 rounded-full"></div>
+                ))
+              ) : (
+                <div key={booking._id} className="bg-white border-4 border-slate-900 shadow-[8px_8px_0_0_#cbd5e1] p-8 flex flex-col">
+                    <div className="border-b-4 border-slate-900 pb-6 mb-6">
+                       <div className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">LEGACY CORRUPTED RECORD</div>
+                       <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tighter leading-none">{getTrainName(booking.trainId)} <span className="text-sm font-mono bg-slate-200 text-slate-900 px-2 py-1 ml-2">{booking.trainId}</span></h2>
+                    </div>
+                    <div>
+                       <div className="text-sm font-bold text-slate-600 mb-4 uppercase tracking-widest">Metadata retained. Identity signatures lost.</div>
+                       <div className="flex gap-4 flex-wrap">
+                          {booking.seats.map(seat => (
+                             <span key={seat} className="bg-slate-900 text-white px-4 py-2 text-lg font-black font-mono border-2 border-slate-900">
+                                {seat}
+                             </span>
+                          ))}
+                       </div>
+                    </div>
                 </div>
-              ))
-            ) : (
-              <div key={booking._id} className="flex flex-col sm:flex-row bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-200 overflow-hidden relative transition-transform hover:-translate-y-1 duration-300 w-full group">
-                  <div className="bg-slate-400 sm:w-48 p-6 flex flex-col justify-between relative overflow-hidden group-hover:bg-slate-500 transition-colors">
-                    <div className="z-10">
-                      <p className="text-white text-xs font-bold tracking-widest uppercase mb-1">Legacy Booking</p>
-                      <h3 className="text-white text-2xl font-bold font-mono tracking-tight leading-none mb-4">{booking.trainId}</h3>
-                    </div>
-                  </div>
-                  <div className="p-6 sm:p-8 flex-1 flex justify-between items-center bg-gradient-to-br from-white to-slate-50 relative">
-                     <div>
-                        <p className="text-slate-500 font-medium">Legacy Booking (No Passenger Details)</p>
-                        <div className="flex gap-2 mt-4 flex-wrap">
-                           {booking.seats.map(seat => (
-                              <span key={seat} className="bg-slate-100 text-slate-700 px-3 py-1 rounded-md text-sm font-bold font-mono border border-slate-200">
-                                 {seat}
-                              </span>
-                           ))}
-                        </div>
-                     </div>
-                  </div>
-              </div>
-            )
-          ))}
-        </div>
-      )}
+              )
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

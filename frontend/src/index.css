@@ -2,18 +2,18 @@
 
 @layer base {
   :root {
-    --background: #f8fafc;
+    --background: #f1f5f9;
     --foreground: #0f172a;
-    --primary: #1e3a8a; /* Deep Blue */
+    --primary: #059669; /* emerald-600 */
     --primary-foreground: #ffffff;
-    --accent: #f97316; /* Vibrant Orange */
-    --accent-foreground: #ffffff;
+    --accent: #f59e0b; /* amber-500 */
+    --accent-foreground: #000000;
     --card: #ffffff;
     --card-foreground: #0f172a;
-    --border: #e2e8f0;
-    --input: #e2e8f0;
-    --ring: #1e3a8a;
-    --radius: 0.5rem;
+    --border: #cbd5e1;
+    --input: #94a3b8;
+    --ring: #0f172a;
+    --radius: 0rem; /* Flat layout, zero radius */
   }
   
   html {
@@ -23,6 +23,11 @@
   body {
     background-color: var(--background);
     color: var(--foreground);
-    @apply antialiased min-h-screen selection:bg-blue-200 selection:text-blue-900;
+    @apply antialiased min-h-screen text-slate-900 selection:bg-emerald-200 selection:text-emerald-900;
+  }
+  
+  /* Reset link styles to avoid residual color themes */
+  a {
+    color: inherit;
   }
 }
