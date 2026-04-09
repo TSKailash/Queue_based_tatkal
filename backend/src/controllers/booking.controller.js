@@ -5,7 +5,7 @@ import Booking from "../models/Booking.js";
 
 export async function confirmBooking(req, res){
     const {trainId}=req.params
-    const {seats}=req.body
+    const {seats, passengers}=req.body
     const userId=req.user.id
 
     if(!userId){
@@ -14,6 +14,10 @@ export async function confirmBooking(req, res){
 
     if(!Array.isArray(seats) || seats.length === 0){
         return res.status(400).json({message: "Seats must be a non-empty array"})
+    }
+
+    if(!Array.isArray(passengers) || passengers.length !== seats.length){
+        return res.status(400).json({message: "Must provide passenger details for each selected seat"})
     }
 
     const activeKey=redisKeys.activeUser(trainId)
@@ -63,7 +67,8 @@ export async function confirmBooking(req, res){
     const booking = await Booking.create({
         userId,
         trainId,
-        seats
+        seats,
+        passengers
     })
 
     return res.json({

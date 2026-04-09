@@ -6,6 +6,7 @@ import queueRoutes from "./routes/queue.routes.js";
 import seatRoutes from "./routes/seats.routes.js";
 import bookingRoutes from "./routes/booking.routes.js";
 import authRoutes from "./routes/auth.routes.js";
+import userRoutes from "./routes/user.routes.js";
 import cors from "cors";
 
 
@@ -18,5 +19,6 @@ app.use("/queue", queueRoutes);
 app.use("/seats", seatRoutes);
 app.use("/booking", bookingRoutes);
 app.use("/auth", authRoutes);
+app.use("/user", userRoutes);
 
 export default app;

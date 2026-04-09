@@ -15,6 +15,13 @@ const bookingSchema = new mongoose.Schema(
       type: [String],
       required: true
     },
+    passengers: [
+      {
+        name: { type: String, required: true },
+        age: { type: Number, required: true },
+        seat: { type: String, required: true }
+      }
+    ],
     status: {
       type: String,
       enum: ["CONFIRMED", "CANCELLED"],

@@ -22,7 +22,13 @@ const userSchema = new mongoose.Schema(
     verificationCode: {
       type: String,
       default: ""
-    }
+    },
+    masterList: [
+      {
+        name: { type: String, required: true },
+        age: { type: Number, required: true }
+      }
+    ]
   },
   { timestamps: true }
 );

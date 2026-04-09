@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import axios from "../api/axios";
 import { Button } from "../components/ui/Button";
 import { Input } from "../components/ui/Input";
@@ -7,8 +7,10 @@ import { Loader } from "../components/ui/Loader";
 
 export default function Queue() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const queryTrain = new URLSearchParams(location.search).get("train");
 
-  const [trainId, setTrainId] = useState("trainA");
+  const [trainId, setTrainId] = useState(queryTrain || "trainA");
   const [joined, setJoined] = useState(false);
   const [position, setPosition] = useState(null);
   const [status, setStatus] = useState(null);

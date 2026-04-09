@@ -44,7 +44,7 @@ export default function Register() {
     try {
       await axios.post("/auth/verify-email", { email: registeredEmail, code: otp });
       setSuccess("Email verified successfully! Redirecting to login...");
-      setTimeout(() => navigate("/"), 1500);
+      setTimeout(() => navigate("/login"), 1500);
     } catch (err) {
       setError(err.response?.data?.message || "Verification failed");
     } finally {
@@ -173,7 +173,7 @@ export default function Register() {
           {step === 1 && (
             <p className="mt-8 text-center text-sm text-slate-600">
               Already have an account?{" "}
-              <Link to="/" className="font-semibold text-indigo-600 hover:text-indigo-500 transition-colors">
+              <Link to="/login" className="font-semibold text-indigo-600 hover:text-indigo-500 transition-colors">
                 Sign in instead
               </Link>
             </p>

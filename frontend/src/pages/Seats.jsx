@@ -16,6 +16,12 @@ export default function SeatPage() {
   const [loading, setLoading] = useState(false);
   const [initialLoad, setInitialLoad] = useState(true);
 
+  // Master List State
+  const [masterList, setMasterList] = useState([]);
+  const [showPassengerModal, setShowPassengerModal] = useState(false);
+  const [passengerAssignments, setPassengerAssignments] = useState({}); // { [seatId]: passengerObj }
+  const [newPassenger, setNewPassenger] = useState({ name: "", age: "" });
+
   const fetchSeats = async () => {
     try {
       const res = await api.get(`/seats/status/${trainId}`);
@@ -40,9 +46,19 @@ export default function SeatPage() {
     }
   };
 
+  const fetchMasterList = async () => {
+    try {
+      const res = await api.get("/user/masterlist");
+      setMasterList(res.data.masterList);
+    } catch (err) {
+      console.error("Failed to fetch master list");
+    }
+  };
+
   useEffect(() => {
     fetchSeats();
     fetchActiveStatus();
+    fetchMasterList();
 
     const interval = setInterval(() => {
       fetchSeats();
@@ -65,6 +81,9 @@ export default function SeatPage() {
 
     if (selectedSeats.includes(seatId)) {
       setSelectedSeats(selectedSeats.filter((s) => s !== seatId));
+      const newAssignments = { ...passengerAssignments };
+      delete newAssignments[seatId];
+      setPassengerAssignments(newAssignments);
     } else {
       if (selectedSeats.length >= 6) {
         alert("Maximum 6 seats allowed");
@@ -83,6 +102,7 @@ export default function SeatPage() {
       setLoading(true);
       await api.post(`/seats/lock/${trainId}`, { seats: selectedSeats });
       fetchSeats();
+      setShowPassengerModal(true); // Open modal after locking
     } catch (err) {
       alert(err.response?.data?.message || "Lock failed");
     } finally {
@@ -95,9 +115,21 @@ export default function SeatPage() {
       alert("Select seats first");
       return;
     }
+
+    const passengers = selectedSeats.map((seat) => {
+      const p = passengerAssignments[seat];
+      return { seat, name: p?.name, age: p?.age };
+    });
+
+    if (passengers.some((p) => !p.name || !p.age)) {
+      alert("Please assign all passengers to your selected seats.");
+      setShowPassengerModal(true);
+      return;
+    }
+
     try {
       setLoading(true);
-      await api.post(`/booking/confirm/${trainId}`, { seats: selectedSeats });
+      await api.post(`/booking/confirm/${trainId}`, { seats: selectedSeats, passengers });
       navigate("/history");
     } catch (err) {
       alert(err.response?.data?.message || "Booking failed");
@@ -116,6 +148,24 @@ export default function SeatPage() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleAddPassengerToMasterList = async () => {
+    if (!newPassenger.name || !newPassenger.age) return;
+    try {
+      const res = await api.post("/user/masterlist", newPassenger);
+      setMasterList(res.data.masterList);
+      setNewPassenger({ name: "", age: "" });
+    } catch (err) {
+      alert("Failed to add passenger");
+    }
+  };
+
+  const handleAssignPassenger = (seatId, passenger) => {
+    setPassengerAssignments({
+      ...passengerAssignments,
+      [seatId]: passenger,
+    });
   };
 
   const getSeatStyle = (seatId) => {
@@ -190,6 +240,93 @@ export default function SeatPage() {
          ))}
        </div>
 
+       {showPassengerModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm transition-all duration-300">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto border border-slate-100 flex flex-col">
+            <div className="px-6 py-5 border-b border-slate-100 flex justify-between items-center sticky top-0 bg-white z-10">
+              <h3 className="text-xl font-bold text-slate-800">Assign Passengers</h3>
+              <button onClick={() => setShowPassengerModal(false)} className="text-slate-400 hover:bg-slate-100 p-2 rounded-full transition-colors">
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            
+            <div className="p-6 flex-1 space-y-6">
+              <div className="bg-slate-50 p-5 rounded-xl border border-slate-200">
+                <h4 className="text-sm font-semibold text-slate-600 mb-3 uppercase tracking-wider">Master List</h4>
+                <div className="flex gap-2 flex-wrap mb-4">
+                  {masterList.length === 0 && <span className="text-slate-500 text-sm">No passengers saved.</span>}
+                  {masterList.map((p, idx) => (
+                    <div key={idx} className="bg-white border border-indigo-100 py-1.5 px-3 rounded-lg shadow-sm text-sm text-slate-700 font-medium flex items-center gap-2">
+                      <svg className="w-4 h-4 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                      </svg>
+                      {p.name} ({p.age})
+                    </div>
+                  ))}
+                </div>
+                <div className="flex gap-2 items-center">
+                  <input 
+                    type="text" 
+                    placeholder="Full Name" 
+                    className="flex-1 px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    value={newPassenger.name}
+                    onChange={(e) => setNewPassenger({...newPassenger, name: e.target.value})}
+                  />
+                  <input 
+                    type="number" 
+                    placeholder="Age" 
+                    className="w-20 px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    value={newPassenger.age}
+                    onChange={(e) => setNewPassenger({...newPassenger, age: e.target.value})}
+                  />
+                  <Button onClick={handleAddPassengerToMasterList} variant="primary" size="sm" className="whitespace-nowrap px-4 bg-indigo-600 hover:bg-indigo-700">Add New</Button>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <h4 className="text-sm font-semibold text-slate-600 uppercase tracking-wider">Assign to Locked Seats</h4>
+                {selectedSeats.map(seatId => (
+                  <div key={seatId} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-white border border-slate-200 rounded-xl shadow-sm gap-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-indigo-50 text-indigo-600 font-bold font-mono rounded-lg flex items-center justify-center border border-indigo-100">
+                        {seatId}
+                      </div>
+                      <div className="text-sm">
+                        {passengerAssignments[seatId] ? (
+                          <span className="font-semibold text-slate-800">{passengerAssignments[seatId].name} <span className="text-slate-500 font-normal">({passengerAssignments[seatId].age} yrs)</span></span>
+                        ) : (
+                          <span className="text-rose-500 font-medium">Unassigned</span>
+                        )}
+                      </div>
+                    </div>
+                    <select 
+                      className="px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 max-w-xs w-full sm:w-auto"
+                      value={passengerAssignments[seatId]?._id || ""}
+                      onChange={(e) => {
+                        const selected = masterList.find(p => p._id === e.target.value);
+                        if(selected) handleAssignPassenger(seatId, selected);
+                      }}
+                    >
+                      <option value="" disabled>Select from Master List</option>
+                      {masterList.map(p => (
+                        <option key={p._id} value={p._id}>{p.name} ({p.age})</option>
+                      ))}
+                    </select>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="px-6 py-5 bg-slate-50 border-t border-slate-100 rounded-b-2xl flex justify-end gap-3 sticky bottom-0">
+               <Button onClick={() => setShowPassengerModal(false)} variant="accent" className="bg-white">Close</Button>
+               <Button onClick={confirmBooking} variant="primary" isLoading={loading} className="!bg-green-600 hover:!bg-green-700">Confirm Booking</Button>
+            </div>
+          </div>
+        </div>
+       )}
+
        <div className="fixed bottom-0 left-0 w-full bg-white border-t border-slate-200 shadow-[0_-4px_20px_rgba(0,0,0,0.08)] z-50 p-4 transform transition-transform">
          <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
            <div className="flex-1 w-full text-center sm:text-left">
@@ -217,7 +354,10 @@ export default function SeatPage() {
               </Button>
               <Button 
                 variant="primary" 
-                onClick={confirmBooking} 
+                onClick={() => {
+                  if (selectedSeats.length === 0) { alert("Select seats first"); return; }
+                  setShowPassengerModal(true);
+                }} 
                 isLoading={loading}
                 className="flex-1 sm:flex-none !bg-green-600 hover:!bg-green-700 shadow-green-200 text-sm sm:text-base py-3"
               >
