@@ -2,7 +2,7 @@
 
 @layer base {
   :root {
-    --background: #f1f5f9;
+    --background: #f8fafc;
     --foreground: #0f172a;
     --primary: #059669; /* emerald-600 */
     --primary-foreground: #ffffff;
@@ -10,10 +10,10 @@
     --accent-foreground: #000000;
     --card: #ffffff;
     --card-foreground: #0f172a;
-    --border: #cbd5e1;
-    --input: #94a3b8;
-    --ring: #0f172a;
-    --radius: 0rem; /* Flat layout, zero radius */
+    --border: #e2e8f0;
+    --input: #cbd5e1;
+    --ring: #059669;
+    --radius: 0.375rem; /* rounded-md */
   }
   
   html {
@@ -23,11 +23,6 @@
   body {
     background-color: var(--background);
     color: var(--foreground);
-    @apply antialiased min-h-screen text-slate-900 selection:bg-emerald-200 selection:text-emerald-900;
-  }
-  
-  /* Reset link styles to avoid residual color themes */
-  a {
-    color: inherit;
+    @apply antialiased min-h-screen text-slate-800 selection:bg-emerald-100 selection:text-emerald-900;
   }
 }

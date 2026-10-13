@@ -7,11 +7,11 @@ export default function Home() {
   const { token } = useContext(AuthContext);
 
   const trains = [
-    { id: "trainA", name: "SHATABDI EXP", number: "12001", from: "NDLS", to: "BPL", dep: "06:00", arr: "14:25", class: "CC, EC", quota: "TATKAL" },
-    { id: "trainB", name: "RAJDHANI EXP", number: "12951", from: "MMCT", to: "NDLS", dep: "17:00", arr: "08:32", class: "1A, 2A", quota: "TATKAL" },
-    { id: "trainC", name: "VANDE BHARAT", number: "22436", from: "NDLS", to: "BSB", dep: "06:00", arr: "14:00", class: "CC, EC", quota: "TATKAL" },
-    { id: "trainD", name: "DURONTO EXP", number: "12239", from: "BCT", to: "HWH", dep: "23:15", arr: "19:40", class: "1A, 2A, 3A", quota: "TATKAL" },
-    { id: "trainE", name: "GARIB RATH", number: "12215", from: "DEE", to: "BDTS", dep: "08:55", arr: "08:10", class: "3A, CC", quota: "TATKAL" },
+    { id: "trainA", name: "Shatabdi Express", number: "12001", from: "NDLS", to: "BPL", dep: "06:00", arr: "14:25", class: "CC, EC", quota: "TATKAL" },
+    { id: "trainB", name: "Rajdhani Express", number: "12951", from: "MMCT", to: "NDLS", dep: "17:00", arr: "08:32", class: "1A, 2A", quota: "TATKAL" },
+    { id: "trainC", name: "Vande Bharat", number: "22436", from: "NDLS", to: "BSB", dep: "06:00", arr: "14:00", class: "CC, EC", quota: "TATKAL" },
+    { id: "trainD", name: "Duronto Express", number: "12239", from: "BCT", to: "HWH", dep: "23:15", arr: "19:40", class: "1A, 2A, 3A", quota: "TATKAL" },
+    { id: "trainE", name: "Garib Rath", number: "12215", from: "DEE", to: "BDTS", dep: "08:55", arr: "08:10", class: "3A, CC", quota: "TATKAL" },
   ];
 
   const handleBookTrain = (trainId) => {
@@ -23,91 +23,86 @@ export default function Home() {
   };
 
   return (
-    <div className="flex-1 flex flex-col w-full bg-slate-100 min-h-screen">
+    <div className="flex-1 flex flex-col w-full bg-slate-50 min-h-screen">
       
-      {/* Heavy Header Block */}
-      <section className="bg-slate-900 border-b-8 border-slate-800 text-white p-8 sm:p-12">
-        <div className="w-full max-w-7xl mx-auto">
-          <div className="inline-block bg-emerald-600 text-white font-black text-xs px-2 py-1 uppercase tracking-widest mb-4">
-            Network Status: Operational
+      {/* Modern Clean Header */}
+      <section className="bg-slate-900 border-b border-slate-800 text-white pt-16 pb-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="inline-flex items-center gap-2 px-3 py-1 bg-emerald-500/10 border border-emerald-500/20 rounded-full mb-6 text-emerald-400 text-sm font-medium">
+             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+             Tatkal Booking System Online
           </div>
-          <h1 className="text-4xl sm:text-6xl font-black uppercase tracking-tighter leading-none mb-4">
-            Priority Railway <br/> Booking Interface
+          <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight mb-4 text-white">
+            Secure your priority travel seats.
           </h1>
-          <div className="w-24 h-2 bg-emerald-600 mb-6"></div>
-          <p className="text-lg text-slate-300 max-w-3xl font-medium leading-relaxed">
-            Execute secure and immediate train queries. All services listed below are currently available for priority queuing.
+          <p className="text-lg text-slate-300 max-w-2xl font-normal leading-relaxed">
+            Reserve waitlist priority securely across all national lines. Please browse the verified train catalog and proceed to book.
           </p>
         </div>
       </section>
 
       {/* Main Table Interface */}
-      <section className="flex-1 w-full max-w-7xl mx-auto p-4 sm:p-8">
+      <section className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 -mt-8 pb-20">
         
-        <div className="w-full border-4 border-slate-900 bg-white">
-          <div className="bg-slate-900 p-4 border-b-4 border-slate-900 flex justify-between items-center">
-             <h2 className="text-white font-black uppercase tracking-widest text-lg">Active Train Registry</h2>
-             <span className="bg-emerald-600 text-white px-3 py-1 text-xs font-bold uppercase">5 Registers Active</span>
+        <div className="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden">
+          <div className="bg-slate-50 border-b border-slate-200 p-5 px-6 flex justify-between items-center">
+             <div>
+               <h2 className="text-lg font-bold text-slate-800">Available Trains</h2>
+               <p className="text-sm text-slate-500 mt-0.5">Select a train to access the booking engine queue.</p>
+             </div>
           </div>
 
-          <div className="w-full overflow-x-auto">
-            <table className="w-full text-left border-collapse min-w-[800px]">
+          <div className="overflow-x-auto w-full">
+            <table className="w-full text-left bg-white text-sm">
               <thead>
-                <tr className="bg-slate-200 border-b-4 border-slate-900 text-xs font-black text-slate-900 uppercase tracking-widest">
-                  <th className="py-4 px-6 border-r-2 border-slate-300">Identifier</th>
-                  <th className="py-4 px-6 border-r-2 border-slate-300">Origin</th>
-                  <th className="py-4 px-6 border-r-2 border-slate-300">Destination</th>
-                  <th className="py-4 px-6 border-r-2 border-slate-300">Timing</th>
-                  <th className="py-4 px-6 border-r-2 border-slate-300 bg-slate-300">Specs</th>
-                  <th className="py-4 px-6 text-center w-48">Execution</th>
+                <tr className="bg-white border-b border-slate-200 text-slate-500 uppercase tracking-wider text-xs">
+                  <th className="py-4 px-6 font-semibold">Train Service</th>
+                  <th className="py-4 px-6 font-semibold">Origin</th>
+                  <th className="py-4 px-6 font-semibold">Destination</th>
+                  <th className="py-4 px-6 font-semibold">Timings</th>
+                  <th className="py-4 px-6 font-semibold">Classes</th>
+                  <th className="py-4 px-6 text-right font-semibold">Action</th>
                 </tr>
               </thead>
-              <tbody className="bg-white">
-                {trains.map((train, idx) => (
-                  <tr key={train.id} className={`border-b-2 border-slate-300 hover:bg-slate-100 ${idx % 2 === 0 ? 'bg-white' : 'bg-slate-50'}`}>
-                    
-                    <td className="py-5 px-6 border-r-2 border-slate-300 align-middle">
-                      <div className="font-black text-slate-900 text-lg uppercase leading-none">{train.name}</div>
-                      <div className="text-sm text-slate-500 font-mono font-bold mt-1 tracking-widest">LOC-{train.number}</div>
+              <tbody className="divide-y divide-slate-100">
+                {trains.map((train) => (
+                  <tr key={train.id} className="hover:bg-slate-50 transition-colors group">
+                    <td className="py-5 px-6 align-middle">
+                      <div className="font-semibold text-slate-900 text-base">{train.name}</div>
+                      <div className="text-slate-500 font-mono mt-1 text-xs">NO. {train.number}</div>
                     </td>
 
-                    <td className="py-5 px-6 border-r-2 border-slate-300 align-middle">
-                      <div className="text-2xl font-black text-slate-900 font-mono">{train.from}</div>
-                      <div className="text-xs font-bold text-slate-500 uppercase tracking-widest">Depart</div>
+                    <td className="py-5 px-6 align-middle">
+                      <div className="font-semibold text-slate-900 text-base">{train.from}</div>
+                      <div className="text-slate-500 text-xs mt-1">Departure</div>
                     </td>
 
-                    <td className="py-5 px-6 border-r-2 border-slate-300 align-middle">
-                      <div className="text-2xl font-black text-slate-900 font-mono">{train.to}</div>
-                      <div className="text-xs font-bold text-slate-500 uppercase tracking-widest">Arrive</div>
+                    <td className="py-5 px-6 align-middle">
+                      <div className="font-semibold text-slate-900 text-base">{train.to}</div>
+                      <div className="text-slate-500 text-xs mt-1">Arrival</div>
                     </td>
 
-                    <td className="py-5 px-6 border-r-2 border-slate-300 align-middle">
-                      <div className="flex items-center gap-4">
-                        <div>
-                          <div className="font-black text-slate-900 text-lg">{train.dep}</div>
-                          <div className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">OUT</div>
-                        </div>
-                        <div className="text-slate-300 font-mono">&rarr;</div>
-                        <div>
-                          <div className="font-black text-slate-900 text-lg">{train.arr}</div>
-                          <div className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">IN</div>
-                        </div>
+                    <td className="py-5 px-6 align-middle text-slate-900">
+                      <div className="flex items-center gap-3">
+                         <div className="font-medium">{train.dep}</div>
+                         <svg className="w-4 h-4 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
+                         <div className="font-medium">{train.arr}</div>
                       </div>
                     </td>
 
-                    <td className="py-5 px-6 border-r-2 border-slate-300 align-middle bg-slate-50">
-                      <div className="text-sm font-black text-slate-900">{train.class}</div>
-                      <div className="inline-block mt-1 px-1 py-0.5 bg-emerald-100 text-emerald-900 text-[10px] font-black uppercase tracking-widest border border-emerald-900">
+                    <td className="py-5 px-6 align-middle">
+                      <div className="font-medium text-slate-800">{train.class}</div>
+                      <div className="inline-block mt-1.5 px-2 py-0.5 bg-slate-100 text-slate-600 text-[10px] font-bold uppercase rounded border border-slate-200">
                         {train.quota}
                       </div>
                     </td>
 
-                    <td className="py-5 px-6 align-middle bg-emerald-50">
+                    <td className="py-5 px-6 align-middle text-right">
                       <button 
                         onClick={() => handleBookTrain(train.id)}
-                        className="w-full bg-slate-900 hover:bg-emerald-600 text-white font-black uppercase tracking-widest py-3 border-2 border-slate-900 hover:border-emerald-600 transition-none"
+                        className="bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold py-2 px-5 rounded-md transition-colors shadow-sm focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 w-full sm:w-auto"
                       >
-                        Execute
+                        Book Now
                       </button>
                     </td>
 

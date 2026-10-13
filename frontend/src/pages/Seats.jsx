@@ -70,8 +70,29 @@ export default function SeatPage() {
     const timer = setInterval(() => {
       setRemainingTime((prev) => (prev > 0 ? prev - 1 : 0));
     }, 1000);
-    return () => clearInterval(timer);
-  }, []);
+
+    const leaveActive = () => {
+      const token = localStorage.getItem("token");
+      if (token) {
+        fetch(`http://localhost:5000/queue/optout/${trainId}`, {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${token}`
+          },
+          keepalive: true
+        }).catch(console.error);
+      }
+    };
+
+    window.addEventListener("beforeunload", leaveActive);
+
+    return () => {
+      clearInterval(timer);
+      window.removeEventListener("beforeunload", leaveActive);
+      // Wait we don't want to call leaveActive on standard unmount like when navigating to history after successful booking
+      // Let's only handle tab close here.
+    };
+  }, [trainId]);
 
   const handleSeatClick = (seatId) => {
     const seat = seats[seatId];
@@ -168,45 +189,47 @@ export default function SeatPage() {
 
   const getSeatStyle = (seatId) => {
     const seat = seats[seatId];
-    const base = "relative flex items-center justify-center h-12 w-12 sm:h-14 sm:w-14 border-2 font-black cursor-pointer transition-none text-xs sm:text-sm select-none uppercase tracking-widest";
+    const base = "relative flex items-center justify-center h-12 w-12 sm:h-14 sm:w-14 rounded-md border text-sm font-semibold cursor-pointer transition-colors select-none shadow-sm";
     
     // Status Logic
-    if (!seat) return `${base} bg-slate-300 border-slate-400 text-slate-500 cursor-not-allowed`;
+    if (!seat) return `${base} bg-slate-100 border-slate-200 text-slate-400 cursor-not-allowed shadow-none`;
 
-    if (seat.status === "BOOKED") return `${base} bg-slate-800 border-slate-900 text-slate-400 cursor-not-allowed opacity-40`;
-    if (seat.status === "LOCKED_BY_OTHER") return `${base} bg-orange-500 border-slate-900 text-slate-900 cursor-not-allowed shadow-[2px_2px_0_0_#0f172a]`;
-    if (seat.status === "LOCKED_BY_ME") return `${base} bg-white border-emerald-600 text-emerald-700 underline shadow-[4px_4px_0_0_#059669] z-10`;
+    if (seat.status === "BOOKED") return `${base} bg-slate-200 border-slate-300 text-slate-400 cursor-not-allowed opacity-60 shadow-none`;
+    if (seat.status === "LOCKED_BY_OTHER") return `${base} bg-amber-500 border-amber-600 text-white cursor-not-allowed shadow-none`;
+    if (seat.status === "LOCKED_BY_ME") return `${base} bg-white border-2 border-emerald-500 text-emerald-700 z-10`;
 
-    if (selectedSeats.includes(seatId)) return `${base} bg-emerald-600 border-slate-900 text-white shadow-[4px_4px_0_0_#0f172a] z-10`;
+    if (selectedSeats.includes(seatId)) return `${base} bg-emerald-600 border-emerald-700 text-white z-10 shadow-md transform scale-105 transition-transform duration-150`;
     
     // Available
-    return `${base} bg-white border-slate-300 text-slate-900 hover:border-slate-900 hover:bg-slate-100 hover:shadow-[4px_4px_0_0_#0f172a] z-0`;
+    return `${base} bg-white border-slate-300 text-slate-700 hover:border-emerald-400 hover:bg-emerald-50 z-0`;
   };
 
   const seatIds = Array.from({ length: 40 }, (_, i) => `S${i + 1}`);
 
   if (initialLoad) return (
-     <div className="flex-1 flex justify-center items-center bg-slate-100">
-        <div className="bg-slate-900 text-white font-black uppercase tracking-widest px-6 py-3 border-2 border-slate-900">FETCHING TOPOLOGY...</div>
+     <div className="flex-1 flex justify-center items-center bg-slate-50">
+        <div className="text-slate-500 font-medium">Loading seat availability...</div>
      </div>
   );
 
   return (
-    <div className="flex-1 flex flex-col bg-slate-100 relative pb-32">
-       {/* High Contrast Top Bar */}
-       <div className="bg-slate-900 border-b-4 border-emerald-600 sticky top-0 z-40 py-4 px-4 sm:px-8">
-         <div className="w-full flex justify-between items-center text-white">
+    <div className="flex-1 flex flex-col bg-slate-50 relative pb-32">
+       {/* Clean Top Bar */}
+       <div className="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm py-4 px-4 sm:px-6 lg:px-8">
+         <div className="max-w-7xl mx-auto flex justify-between items-center text-slate-900">
            <div className="flex flex-col">
-             <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Target Sector</span>
-             <h2 className="text-xl sm:text-2xl font-black uppercase tracking-widest">{trainId}-BLOCK</h2>
+             <h2 className="text-xl sm:text-2xl font-bold tracking-tight">Train: {trainId}</h2>
+             <span className="text-xs font-semibold text-emerald-600 uppercase tracking-wider mt-1 flex items-center gap-2">
+                 <span className="w-2 h-2 bg-emerald-500 rounded-full inline-block animate-pulse"></span>
+                 Booking Active
+             </span>
            </div>
            
            <div className="flex items-center gap-4">
              <div className="hidden sm:block text-right">
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5 block">Time to Auto-Close</span>
-                <span className="text-emerald-500 text-xs font-bold uppercase tracking-widest pulse-slow">Window Live</span>
+                <span className="text-xs font-medium text-slate-500 block">Session closes in</span>
              </div>
-             <div className="bg-white text-slate-900 text-3xl font-black px-4 py-2 border-2 border-slate-900 shadow-[4px_4px_0_0_#059669]">
+             <div className="bg-slate-50 text-red-600 font-mono text-2xl font-bold px-4 py-1.5 rounded-md border border-slate-200">
                00:{remainingTime.toString().padStart(2, '0')}
              </div>
            </div>
@@ -214,23 +237,23 @@ export default function SeatPage() {
        </div>
 
        {/* Main Grid/Control Split */}
-       <div className="w-full mx-auto px-4 sm:px-8 py-8 flex flex-col xl:flex-row gap-8">
+       <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 flex flex-col xl:flex-row gap-8">
           
           {/* Seat Grid Block */}
           <div className="flex-1">
-             <div className="bg-white border-4 border-slate-900 p-8 shadow-[8px_8px_0_0_#0f172a]">
+             <div className="bg-white border border-slate-200 rounded-xl p-8 shadow-sm">
                 
-                {/* Heavy Legend */}
-                <div className="flex flex-wrap gap-x-8 gap-y-4 mb-10 pb-6 border-b-4 border-slate-900 text-[10px] sm:text-xs font-black text-slate-900 uppercase tracking-widest">
-                  <div className="flex items-center gap-2"><div className="w-6 h-6 border-2 border-slate-300 bg-white shadow-[2px_2px_0_0_#cbd5e1]"></div> OPEN</div>
-                  <div className="flex items-center gap-2"><div className="w-6 h-6 border-2 border-slate-900 bg-emerald-600 shadow-[2px_2px_0_0_#0f172a]"></div> ASSIGNED TO YOU</div>
-                  <div className="flex items-center gap-2"><div className="w-6 h-6 border-2 border-emerald-600 bg-white underline shadow-[2px_2px_0_0_#059669]"></div> YOUR LOCK</div>
-                  <div className="flex items-center gap-2"><div className="w-6 h-6 border-2 border-slate-900 bg-orange-500 shadow-[2px_2px_0_0_#0f172a]"></div> EXTERNAL LOCK</div>
-                  <div className="flex items-center gap-2"><div className="w-6 h-6 border-2 border-slate-900 bg-slate-800 opacity-40"></div> INVALID/PURCHASED</div>
+                {/* Neat Legend */}
+                <div className="flex flex-wrap gap-x-8 gap-y-4 mb-8 pb-6 border-b border-slate-100 text-xs font-medium text-slate-600">
+                  <div className="flex items-center gap-2.5"><div className="w-4 h-4 rounded border border-slate-300 bg-white"></div> Available</div>
+                  <div className="flex items-center gap-2.5"><div className="w-4 h-4 rounded border border-emerald-700 bg-emerald-600"></div> Selected</div>
+                  <div className="flex items-center gap-2.5"><div className="w-4 h-4 rounded border-2 border-emerald-500 bg-white"></div> Locked by you</div>
+                  <div className="flex items-center gap-2.5"><div className="w-4 h-4 rounded border border-amber-600 bg-amber-500"></div> Booked by others</div>
+                  <div className="flex items-center gap-2.5"><div className="w-4 h-4 rounded border border-slate-300 bg-slate-200"></div> Unavailable</div>
                 </div>
 
                 {/* Grid */}
-                <div className="grid grid-cols-4 sm:grid-cols-6 lg:grid-cols-8 gap-3 sm:gap-5 justify-items-center">
+                <div className="grid grid-cols-4 sm:grid-cols-6 lg:grid-cols-8 gap-3 sm:gap-4 justify-items-center">
                   {seatIds.map((seatId) => (
                     <div
                       key={seatId}
@@ -244,35 +267,37 @@ export default function SeatPage() {
              </div>
           </div>
 
-          {/* Passenger Injection Control */}
-          <div className="w-full xl:w-[400px]">
-             <div className="bg-slate-900 border-4 border-slate-900 p-px shadow-[8px_8px_0_0_#059669] sticky top-32">
-                <h3 className="bg-slate-900 text-white font-black uppercase tracking-widest p-4">Passenger Binding</h3>
+          {/* Passenger Assignment Sidebar */}
+          <div className="w-full xl:w-[380px]">
+             <div className="bg-white border border-slate-200 rounded-xl shadow-sm sticky top-32 overflow-hidden">
+                <div className="bg-slate-50 border-b border-slate-200 px-6 py-4">
+                  <h3 className="text-sm font-semibold text-slate-800">Passenger Assignment</h3>
+                </div>
                 
-                <div className="bg-white p-6">
+                <div className="p-6">
                   {selectedSeats.length === 0 ? (
-                     <div className="bg-slate-100 border-2 border-slate-900 p-6 text-center">
-                       <span className="text-xs font-black text-slate-500 uppercase tracking-widest">No target slots selected</span>
+                     <div className="bg-slate-50 border border-slate-200 rounded-md p-6 text-center">
+                       <span className="text-sm text-slate-500 font-medium">Please select seats from the map to assign passengers.</span>
                      </div>
                   ) : (
                      <div className="space-y-4">
                        {selectedSeats.map(seatId => (
-                          <div key={seatId} className="bg-slate-50 border-2 border-slate-900 p-4">
+                          <div key={seatId} className="border border-slate-200 rounded-md p-4">
                              <div className="flex justify-between items-center mb-3">
-                                <span className="font-black text-lg text-slate-900">{seatId}</span>
-                                <span className="text-[10px] font-bold text-emerald-600 uppercase tracking-widest border border-emerald-600 px-1">TGT ENABLED</span>
+                                <span className="font-semibold text-sm text-slate-800 bg-slate-100 px-2.5 py-1 rounded-md border border-slate-200">{seatId}</span>
+                                <span className="text-xs font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded">Selected</span>
                              </div>
                              <select 
-                               className="w-full px-3 py-3 bg-white border-2 border-slate-900 text-xs font-black text-slate-900 uppercase tracking-widest focus:outline-none focus:bg-emerald-50 rounded-none cursor-pointer"
+                               className="w-full px-3 py-2 bg-white border border-slate-300 text-sm text-slate-700 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent cursor-pointer"
                                value={passengerAssignments[seatId]?._id || ""}
                                onChange={(e) => {
                                  const selected = masterList.find(p => p._id === e.target.value);
                                  if(selected) handleAssignPassenger(seatId, selected);
                                }}
                              >
-                               <option value="" disabled>-- SELECT IDENTITY --</option>
+                               <option value="" disabled>-- Select passenger --</option>
                                {masterList.map(p => (
-                                 <option key={p._id} value={p._id}>{p.name} (AGE {p.age})</option>
+                                 <option key={p._id} value={p._id}>{p.name} (Age {p.age})</option>
                                ))}
                              </select>
                           </div>
@@ -280,29 +305,29 @@ export default function SeatPage() {
                      </div>
                   )}
 
-                  <div className="mt-8 pt-6 border-t-4 border-slate-900">
-                      <h4 className="text-[10px] font-black text-slate-900 uppercase tracking-widest mb-4">Manual Override - Add Identity</h4>
+                  <div className="mt-8 pt-6 border-t border-slate-100">
+                      <h4 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-4">Quick Add Passenger</h4>
                       <div className="flex flex-col gap-3">
                          <input 
                            type="text" 
-                           placeholder="FULL NAME" 
-                           className="px-4 py-3 bg-slate-100 border-2 border-slate-900 rounded-none text-xs font-black text-slate-900 uppercase tracking-widest focus:outline-none focus:bg-white"
+                           placeholder="Full Name" 
+                           className="px-3 py-2 bg-white border border-slate-300 rounded-md text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-shadow"
                            value={newPassenger.name}
                            onChange={(e) => setNewPassenger({...newPassenger, name: e.target.value})}
                          />
                          <div className="flex gap-3">
                            <input 
                              type="number" 
-                             placeholder="AGE" 
-                             className="w-24 px-4 py-3 bg-slate-100 border-2 border-slate-900 rounded-none text-xs font-black text-slate-900 uppercase tracking-widest focus:outline-none focus:bg-white"
+                             placeholder="Age" 
+                             className="w-20 px-3 py-2 bg-white border border-slate-300 rounded-md text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-shadow"
                              value={newPassenger.age}
                              onChange={(e) => setNewPassenger({...newPassenger, age: e.target.value})}
                            />
                            <button 
                              onClick={handleAddPassengerToMasterList} 
-                             className="flex-1 bg-slate-900 hover:bg-emerald-600 text-white font-black text-xs uppercase tracking-widest transition-none border-2 border-slate-900"
+                             className="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold text-sm rounded-md transition-colors border border-slate-200"
                            >
-                             Inject
+                             Add
                            </button>
                          </div>
                       </div>
@@ -312,34 +337,34 @@ export default function SeatPage() {
           </div>
        </div>
 
-       {/* Heavy Execution Bar */}
-       <div className="fixed bottom-0 left-0 w-full bg-slate-900 border-t-8 border-emerald-600 p-4 sm:p-6 z-50">
-         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6">
-           <div className="text-white text-xs font-black tracking-widest uppercase">
-              Targets Captured: <strong className="ml-2 text-lg text-emerald-400 font-mono tracking-tighter bg-slate-800 px-3 py-1 border border-emerald-600">{selectedSeats.length > 0 ? selectedSeats.join(', ') : 'NONE'}</strong>
+       {/* Professional Sticky Action Bar */}
+       <div className="fixed bottom-0 left-0 w-full bg-white border-t border-slate-200 p-4 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] z-50">
+         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+           <div className="text-slate-600 text-sm font-medium">
+              Selected Seats: <strong className="ml-1 text-slate-900 font-semibold bg-slate-100 px-2.5 py-1 rounded-md border border-slate-200">{selectedSeats.length > 0 ? selectedSeats.join(', ') : 'None'}</strong>
            </div>
            
-           <div className="flex gap-4 w-full sm:w-auto">
+           <div className="flex gap-3 w-full sm:w-auto">
               <button 
                 onClick={optOut} 
                 disabled={loading}
-                className="flex-1 sm:flex-none border-2 border-slate-400 text-slate-300 hover:bg-slate-800 font-black py-4 px-6 uppercase tracking-widest text-xs transition-none"
+                className="flex-1 sm:flex-none bg-white text-slate-700 hover:bg-slate-50 border border-slate-300 font-semibold py-2 px-6 rounded-md text-sm transition-colors"
               >
-                Abort
+                Cancel
               </button>
               <button 
                 onClick={lockSeats} 
                 disabled={loading}
-                className="flex-1 sm:flex-none bg-slate-800 border-2 border-emerald-600 text-emerald-500 hover:bg-emerald-900 hover:text-white font-black py-4 px-6 uppercase tracking-widest text-xs transition-none"
+                className="flex-1 sm:flex-none bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200 font-semibold py-2 px-6 rounded-md text-sm transition-colors"
               >
-                Engage Locks
+                Lock Assigned
               </button>
               <button 
                 onClick={confirmBooking} 
                 disabled={loading}
-                className="flex-[2] sm:flex-none bg-emerald-600 hover:bg-white hover:text-slate-900 text-white border-2 border-emerald-600 font-black py-4 px-10 uppercase tracking-widest text-sm transition-none"
+                className="flex-1 sm:flex-none bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2 px-8 rounded-md text-sm transition-colors shadow-sm"
               >
-                Execute Transaction
+                Confirm Payment
               </button>
            </div>
          </div>

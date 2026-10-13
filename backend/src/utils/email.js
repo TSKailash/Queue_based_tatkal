@@ -9,7 +9,7 @@ export const sendVerificationEmail = async (email, code) => {
       service: "gmail",
       auth: {
         user: process.env.GMAIL_USER,
-        pass: process.env.GMAIL_PASS, // App Password
+        pass: process.env.GMAIL_PASS,
       },
     });
 
